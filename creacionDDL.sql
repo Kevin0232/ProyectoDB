@@ -1,189 +1,182 @@
-DROP DATABASE IF EXISTS test1;
-CREATE DATABASE test1 CHARACTER SET utf8mb4;
+-- DROP DATABASE IF EXISTS test1;
+-- CREATE DATABASE test1 CHARACTER SET utf8mb4;
+SET GLOBAL max_allowed_packet=1073741824;
 USE test1;
+
+
 -- -----------------------------------------------------
--- Table `Status`
+-- Table original_language
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Status` ;
-CREATE TABLE IF NOT EXISTS `Status` (
-  `idStatus` INT NOT NULL AUTO_INCREMENT,
-  `status` VARCHAR(255) NULL,
-  PRIMARY KEY (`idStatus`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS original_language;
+CREATE TABLE original_language(
+    idOringLang INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    name_original_language VARCHAR(2) NOT NULL
+);
+
+
 -- -----------------------------------------------------
--- Table `Original_language`
+-- Table Status
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Original_language` ;
-CREATE TABLE IF NOT EXISTS `Original_language` (
-  `idOriginal_language` INT AUTO_INCREMENT,
-  `language` VARCHAR(255) NULL,
-  PRIMARY KEY (`idOriginal_language`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Status;
+CREATE TABLE Status(
+    idStatus INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    nameStatus VARCHAR(15) NOT NULL
+);
+
+
 -- -----------------------------------------------------
--- Table `Movies`
+-- Table Movie
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Movies` ;
-CREATE TABLE IF NOT EXISTS `Movies` (
-  `idMovie` INT NOT NULL AUTO_INCREMENT,
-  `index` INT NOT NULL,
-  `budget` INT NULL,
-  `homepage` VARCHAR(1000) NULL,
-  `original_title` VARCHAR(1000) NULL,
-  `overview` VARCHAR(5000) NULL,
-  `popularity` DOUBLE NULL,
-  `release_date` DATE NULL,
-  `revenue` INT NULL,
-  `runtime` DOUBLE NULL,
-  `tagline` VARCHAR(1000) NULL,
-  `title` VARCHAR(1000) NULL,
-  `keywords` TEXT(1000) NULL,
-  `vote_count` INT NULL,
-  `vote_average` DOUBLE NULL,
-  `idStatus` INT NOT NULL,
-  `idOriginal_language` INT NOT NULL,
-  PRIMARY KEY (`idMovie`),
-    FOREIGN KEY (`idStatus`)
-    REFERENCES `Status` (`idStatus`),
-    FOREIGN KEY (`idOriginal_language`)
-    REFERENCES `Original_language` (`idOriginal_language`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Movie;
+CREATE TABLE Movie(
+    idMovie INT PRIMARY KEY NOT NULL,
+    `index` INT NOT NULL ,
+    budget BIGINT NOT NULL,
+    homepage VARCHAR(255),
+    keywords VARCHAR(255),
+    idOrigLang INT NOT NULL,
+    original_title VARCHAR(255) NOT NULL,
+    overview TEXT,
+    popularity DOUBLE NOT NULL,
+    release_date DATE,
+    revenue BIGINT NOT NULL,
+    runtime DOUBLE,
+    idStatus INT NOT NULL,
+    tagline VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
+    vote_average DOUBLE NOT NULL,
+    vote_count INT NOT NULL,
+    FOREIGN KEY (idOrigLang) REFERENCES original_language(idOringLang),
+    FOREIGN KEY (idStatus) REFERENCES status(idStatus)
+);
+
+
 -- -----------------------------------------------------
--- Table `Production_companie`
+-- Table Genre
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Production_companie` ;
-CREATE TABLE IF NOT EXISTS `Production_companie` (
-  `idProduction_companie` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL,
-  PRIMARY KEY (`idProduction_companie`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Genre;
+CREATE TABLE Genre(
+    idGenre int PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    nameGenre VARCHAR(100)
+);
+
+
+
 -- -----------------------------------------------------
--- Table `Companie_movie`
+-- Table production_countries
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Companie_movie` ;
-CREATE TABLE IF NOT EXISTS `Companie_movie` (
-  `idProduction_companie` INT NOT NULL,
-  `idMovie` INT NOT NULL,
-  PRIMARY KEY (`idProduction_companie`, `idMovie`),
-    FOREIGN KEY (`idProduction_companie`)
-    REFERENCES `Production_companie` (`idProduction_companie`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS production_countries;
+CREATE TABLE production_countries(
+    iso_3166_1 VARCHAR(10) PRIMARY KEY NOT NULL,
+    pCountryName VARCHAR(255) NOT NULL
+);
+
+
+
 -- -----------------------------------------------------
--- Table `Production_countrie`
+-- Table production_companies
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Production_countrie` ;
-CREATE TABLE IF NOT EXISTS `Production_countrie` (
-  `isoCountrie` VARCHAR(2) NOT NULL,
-  `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`isoCountrie`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS production_companies;
+CREATE TABLE production_companies(
+    pCompanyId INT PRIMARY KEY NOT NULL,
+    pCompanyName VARCHAR(255) NOT NULL
+);
+
+
+
 -- -----------------------------------------------------
--- Table `Countrie_movie`
+-- Table spoken_language
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Countrie_movie` ;
-CREATE TABLE IF NOT EXISTS `Countrie_movie` (
-  `isoCountrie` VARCHAR(2) NOT NULL,
-  `idMovie` INT NOT NULL,
-  PRIMARY KEY (`isoCountrie`, `idMovie`),
-    FOREIGN KEY (`isoCountrie`)
-    REFERENCES `Production_countrie` (`isoCountrie`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS spoken_language;
+CREATE TABLE spoken_language(
+    iso_639_1 VARCHAR(2) PRIMARY KEY NOT NULL,
+    nameSLang VARCHAR(255) NOT NULL
+);
+
+
 -- -----------------------------------------------------
--- Table `Genre`
+-- Table Persona
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Genre` ;
-CREATE TABLE IF NOT EXISTS `Genre` (
-  `idGenre` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`idGenre`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Persona;
+CREATE TABLE Persona(
+    idPerson INT PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    gender INT
+);
+
+
 -- -----------------------------------------------------
--- Table `Genre_movie`
+-- Table Movie_genres
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Genre_movie` ;
-CREATE TABLE IF NOT EXISTS `Genre_movie` (
-  `idMovie` INT NOT NULL,
-  `idGenre` INT NOT NULL,
-  PRIMARY KEY (`idMovie`, `idGenre`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`),
-    FOREIGN KEY (`idGenre`)
-    REFERENCES `Genre` (`idGenre`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Movie_genres;
+CREATE TABLE Movie_genres(
+    idMovie INT NOT NULL,
+    idGenre INT NOT NULL,
+    PRIMARY KEY (idMovie, idGenre),
+    FOREIGN KEY (idMovie) REFERENCES Movie(idMovie),
+    FOREIGN KEY (idGenre) REFERENCES Genre(idGenre)
+);
+
 -- -----------------------------------------------------
--- Table `Spoken_language`
+-- Table Movie_production_countries
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Spoken_language` ;
-CREATE TABLE IF NOT EXISTS `Spoken_language` (
-  `isoLang` VARCHAR(2) NOT NULL,
-  `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`isoLang`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Movie_production_countries;
+CREATE TABLE Movie_production_countries(
+    idMovie INT NOT NULL,
+    iso_3166_1 VARCHAR(255) NOT NULL,
+    PRIMARY KEY (idMovie, iso_3166_1),
+    FOREIGN KEY (idMovie) REFERENCES Movie(idMovie),
+    FOREIGN KEY (iso_3166_1) REFERENCES production_countries(iso_3166_1)
+);
+
 -- -----------------------------------------------------
--- Table `Lenguage_movie`
+-- Table Movie_production_companies
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Lenguage_movie` ;
-CREATE TABLE IF NOT EXISTS `Lenguage_movie` (
-  `idMovie` INT NOT NULL,
-  `isoLang` VARCHAR(2) NOT NULL,
-  PRIMARY KEY (`idMovie`, `isoLang`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`),
-    FOREIGN KEY (`isoLang`)
-    REFERENCES `Spoken_language` (`isoLang`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Movie_production_companies;
+CREATE TABLE Movie_production_companies(
+    idMovie INT NOT NULL,
+    pCompanyId INT NOT NULL,
+    PRIMARY KEY (idMovie, pCompanyId),
+    FOREIGN KEY (idMovie) REFERENCES Movie(idMovie),
+    FOREIGN KEY (pCompanyId) REFERENCES production_companies(pCompanyId)
+);
+
+
 -- -----------------------------------------------------
--- Table `Person`
+-- Table Movie_spoken_languages
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Person` ;
-CREATE TABLE IF NOT EXISTS `Person` (
-  `idPerson` INT NOT NULL,
-  `name` VARCHAR(255) NULL,
-  `gender` INT NULL,
-  PRIMARY KEY (`idPerson`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Movie_spoken_languages;
+CREATE TABLE Movie_spoken_languages(
+    idMovie INT NOT NULL,
+    iso_639_1 VARCHAR(2) NOT NULL,
+    PRIMARY KEY (idMovie, iso_639_1),
+    FOREIGN KEY (idMovie) REFERENCES Movie(idMovie),
+    FOREIGN KEY (iso_639_1) REFERENCES spoken_language(iso_639_1)
+);
+
+
 -- -----------------------------------------------------
--- Table `Crew`
+-- Table Crew
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Crew` ;
-CREATE TABLE IF NOT EXISTS `Crew` (
-  `idMovie` INT NOT NULL,
-  `job` VARCHAR(255) NOT NULL,
-  `idPerson` INT NOT NULL,
-  `department` VARCHAR(255) NULL,
-  `credit_id` VARCHAR(255) NULL,
-  PRIMARY KEY (`idMovie`, `job`, `idPerson`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`),
-    FOREIGN KEY (`idPerson`)
-    REFERENCES `Person` (`idPerson`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Crew;
+CREATE TABLE Crew (
+    idMovie INT NOT NULL,
+    idPerson INT NOT NULL,
+    job VARCHAR(255) NOT NULL,
+    department VARCHAR(255),
+    credit_id VARCHAR(255),
+    PRIMARY KEY (idMovie, idPerson, job),
+    FOREIGN KEY (idMovie) REFERENCES Movie(idMovie),
+    FOREIGN KEY (idPerson) REFERENCES Persona(idPerson)
+);
+
 -- -----------------------------------------------------
--- Table `Cast`
+-- Table Director
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Cast` ;
-CREATE TABLE IF NOT EXISTS `Cast` (
-  `idPerson` INT NOT NULL,
-  `idMovie` INT NOT NULL,
-  PRIMARY KEY (`idPerson`, `idMovie`),
-    FOREIGN KEY (`idPerson`)
-    REFERENCES `Person` (`idPerson`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`))
-ENGINE = InnoDB;
--- -----------------------------------------------------
--- Table `Director`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `Director` ;
-CREATE TABLE IF NOT EXISTS `Director` (
-  `idPerson` INT NOT NULL,
-  `idMovie` INT NOT NULL,
-  PRIMARY KEY (`idPerson`, `idMovie`),
-    FOREIGN KEY (`idPerson`)
-    REFERENCES `Person` (`idPerson`),
-    FOREIGN KEY (`idMovie`)
-    REFERENCES `Movies` (`idMovie`))
-ENGINE = InnoDB;
+DROP TABLE IF EXISTS Director;
+CREATE TABLE Director (
+    idMovie INT NOT NULL,
+    idPerson INT NOT NULL,
+    FOREIGN KEY (idMovie) REFERENCES Movie(idMovie),
+    FOREIGN KEY (idPerson) REFERENCES Persona(idPerson)
+);
